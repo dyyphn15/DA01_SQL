@@ -55,18 +55,71 @@ LEFT OUTER JOIN page_likes AS likes
 WHERE likes.page_id IS NULL;
 --Mid-course test
 --EX1
-
+select distinct replacement_cost from film
+order by replacement_cost;
 --EX2
-
+select 
+case
+	when replacement_cost between 9.99 and 19.99 then 'low'
+	when replacement_cost between 20.00 and 24.99 then 'medium'
+	when replacement_cost between 25.00 and 29.99 then 'high'
+end as category,
+count (*) as so_luong
+from film
+group by category;
 --EX3
-
+select a.title, a.length, c.name
+from film as a
+inner join film_category as b
+on a.film_id = b.film_id
+inner join category as c
+on b.category_id = c.category_id
+where name='Drama' or name='Sports'
+order by length desc;
 --EX4
-
+select c.name,
+count (title) as so_luong from film as a
+inner join film_category as b
+on a.film_id = b.film_id
+inner join category as c
+on b.category_id = c.category_id
+group by c.name
+order by so_luong desc;
 --EX5
-
+SELECT 
+    a.actor_id,
+    a.first_name,
+    a.last_name,
+    COUNT(b.film_id) AS so_luong_phim_tham_gia
+FROM actor a
+JOIN film_actor b ON a.actor_id = b.actor_id
+GROUP BY a.actor_id, a.first_name, a.last_name
+ORDER BY so_luong_phim_tham_gia DESC;
 --EX6
-
+SELECT 
+    a.address_id, a.address
+FROM address a
+LEFT JOIN customer c ON a.address_id = c.address_id
+WHERE c.address_id IS NULL;
 --EX7
-
+SELECT 
+    c.city_id, c.city,
+    SUM(p.amount) AS doanh_thu
+FROM city c
+JOIN address a ON c.city_id = a.city_id
+JOIN customer cu ON a.address_id = cu.address_id
+JOIN payment p ON cu.customer_id = p.customer_id
+GROUP BY c.city_id, c.city
+ORDER BY doanh_thu DESC;
 --EX8
+SELECT 
+    CONCAT(c.city, ', ', co.country) AS city_country,
+    SUM(p.amount) AS doanh_thu
+FROM city c
+JOIN country co ON c.country_id = co.country_id
+JOIN address a ON c.city_id = a.city_id
+JOIN customer cu ON a.address_id = cu.address_id
+JOIN payment p ON cu.customer_id = p.customer_id
+GROUP BY city_country
+ORDER BY doanh_thu;
 
