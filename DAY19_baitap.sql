@@ -21,12 +21,12 @@ UPDATE sales_dataset_rfm_prj
 SET CONTACTLASTNAME = SPLIT_PART(CONTACTFULLNAME, ' ', 2),
     CONTACTFIRSTNAME = SPLIT_PART(CONTACTFULLNAME, ' ', 1);
 
--- Bước 4: Chuẩn hóa CONTACTLASTNAME, CONTACTFIRSTNAME
+-- Chuẩn hóa CONTACTLASTNAME, CONTACTFIRSTNAME
 UPDATE sales_dataset_rfm_prj
 SET CONTACTLASTNAME = INITCAP(CONTACTLASTNAME),
     CONTACTFIRSTNAME = INITCAP(CONTACTFIRSTNAME);
 
--- Bước 5: Thêm cột QTR_ID, MONTH_ID, YEAR_ID
+-- Bước 4: Thêm cột QTR_ID, MONTH_ID, YEAR_ID
 ALTER TABLE sales_dataset_rfm_prj
 ADD COLUMN QTR_ID INT,
 ADD COLUMN MONTH_ID INT,
@@ -37,8 +37,12 @@ SET QTR_ID = EXTRACT(QUARTER FROM ORDERDATE),
     MONTH_ID = EXTRACT(MONTH FROM ORDERDATE),
     YEAR_ID = EXTRACT(YEAR FROM ORDERDATE);
 
--- Bước 6: Tìm và xử lý outliers
--- Tạo bảng mới để lưu dữ liệu đã làm sạch
+-- Bước 5: Tìm và xử lý outliers
+--Cách 1
+
+--Cách 2
+
+-- Bước 6: Tạo bảng mới để lưu dữ liệu đã làm sạch
 CREATE TABLE SALES_DATASET_RFM_PRJ_CLEAN AS
 SELECT *
 FROM sales_dataset_rfm_prj;
