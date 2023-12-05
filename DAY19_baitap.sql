@@ -55,7 +55,27 @@ UPDATE sales_dataset_rfm_prj
 SET QUANTITYORDERED = -3
 WHERE QUANTITYORDERED < -3;
 
---Cách 2
+--Cách 2: IQR (Interquartile Range)
+--Tìm giá trị Q1 và Q3 của cột QUANTITYORDERED:
+SELECT 
+    QUANTILE(QUANTITYORDERED, 0.25) AS q1,
+    QUANTILE(QUANTITYORDERED, 0.75) AS q3
+FROM sales_dataset_rfm_prj;
+--Tính toán IQR (Q3 - Q1):
+SELECT 
+    QUANTILE(QUANTITYORDERED, 0.75) - QUANTILE(QUANTITYORDERED, 0.25) AS iqr
+FROM sales_dataset_rfm_prj;
+--Chọn ngưỡng để xác định outliers, chọn ngưỡng là 1.5*IQR.
+--Xóa bản ghi có giá trị nằm ngoài khoảng IQR:
+DELETE FROM sales_dataset_rfm_prj
+WHERE QUANTITYORDERED < q1 - 1.5*iqr OR QUANTITYORDERED > q3 + 1.5*iqr;
+--Hoặc cập nhật giá trị outliers về giá trị giới hạn:
+UPDATE sales_dataset_rfm_prj
+SET QUANTITYORDERED = q1 - 1.5*iqr
+WHERE QUANTITYORDERED < q1 - 1.5*iqr;
+UPDATE sales_dataset_rfm_prj
+SET QUANTITYORDERED = q3 + 1.5*iqr
+WHERE QUANTITYORDERED > q3 + 1.5*iqr;
 
 -- Bước 6: Tạo bảng mới để lưu dữ liệu đã làm sạch
 CREATE TABLE SALES_DATASET_RFM_PRJ_CLEAN AS
