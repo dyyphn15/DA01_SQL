@@ -38,7 +38,22 @@ SET QTR_ID = EXTRACT(QUARTER FROM ORDERDATE),
     YEAR_ID = EXTRACT(YEAR FROM ORDERDATE);
 
 -- Bước 5: Tìm và xử lý outliers
---Cách 1
+--Cách 1: Z-score
+--Tìm Z-score cho mỗi giá trị trong cột QUANTITYORDERED:
+SELECT *,
+       (QUANTITYORDERED - AVG(QUANTITYORDERED) OVER ()) / STDDEV(QUANTITYORDERED) OVER () AS z_score
+FROM sales_dataset_rfm_prj;
+--Chọn ngưỡng Z-score để xác định outliers, chọn ngưỡng là 3 hoặc -3.
+--Xóa bản ghi có Z-score nằm ngoài ngưỡng:
+DELETE FROM sales_dataset_rfm_prj
+WHERE QUANTITYORDERED < 3 AND QUANTITYORDERED > -3;
+--Hoặc cập nhật giá trị outliers về giá trị giới hạn (3 hoặc -3):
+UPDATE sales_dataset_rfm_prj
+SET QUANTITYORDERED = 3
+WHERE QUANTITYORDERED > 3;
+UPDATE sales_dataset_rfm_prj
+SET QUANTITYORDERED = -3
+WHERE QUANTITYORDERED < -3;
 
 --Cách 2
 
