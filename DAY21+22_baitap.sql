@@ -29,7 +29,7 @@ WITH MonthlyStats AS (
   JOIN
     bigquery-public-data.thelook_ecommerce.users u ON o.user_id = u.id
   WHERE
-    o.status = 'completed'
+    o.status = 'Shipped'
     AND TIMESTAMP(o.created_at) BETWEEN TIMESTAMP('2019-01-01') AND TIMESTAMP('2022-04-30')
   GROUP BY month_year)
 
