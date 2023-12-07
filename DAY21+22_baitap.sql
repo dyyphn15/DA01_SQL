@@ -9,7 +9,7 @@ FROM
 JOIN
     bigquery-public-data.thelook_ecommerce.users u ON o.user_id = u.id
 WHERE
-    o.status = 'completed'
+    o.status = 'Shipped'
     AND o.created_at BETWEEN '2019-01-01' AND '2022-04-30'
 GROUP BY
     month_year
