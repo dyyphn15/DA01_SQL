@@ -100,7 +100,7 @@ WITH MonthlyProfitRank AS (
   JOIN
     bigquery-public-data.thelook_ecommerce.products p ON oi.product_id = p.id
   WHERE
-    o.status = 'completed'
+    o.status = 'Shipped'
     AND TIMESTAMP(o.created_at) BETWEEN TIMESTAMP('2019-01-01') AND TIMESTAMP('2022-04-30')
   GROUP BY
     month_year, oi.product_id, p.name, o.created_at)
@@ -133,7 +133,7 @@ WITH RevenueByCategory AS (
   JOIN
     bigquery-public-data.thelook_ecommerce.products p ON oi.product_id = p.id
   WHERE
-    o.status = 'completed'
+    o.status = 'Shipped'
     AND DATE(o.created_at) BETWEEN DATE_SUB(CURRENT_DATE(), INTERVAL 3 MONTH) AND CURRENT_DATE()
   GROUP BY dates, p.category)
 
