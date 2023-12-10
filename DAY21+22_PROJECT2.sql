@@ -148,4 +148,47 @@ GROUP BY
 ORDER BY dates, product_category;
 
 -- Tạo metric trước khi dựng dashboard
+CREATE VIEW bigquery-public-data.vw_ecommerce_analyst AS
+WITH MonthlyMetrics AS (
+  SELECT
+    EXTRACT(MONTH FROM o.created_at) AS Month,
+    EXTRACT(YEAR FROM o.created_at) AS Year,
+    p.category AS Product_category,
+    SUM(oi.sale_price) AS TPV,
+    COUNT(DISTINCT o.order_id) AS TPO,
+    LAG(SUM(oi.sale_price)) OVER (PARTITION BY p.category ORDER BY EXTRACT(YEAR_MONTH FROM o.created_at)) AS Previous_TPV,
+    LAG(COUNT(DISTINCT o.order_id)) OVER (PARTITION BY p.category ORDER BY EXTRACT(YEAR_MONTH FROM o.created_at)) AS Previous_TPO,
+    SUM(p.cost) AS Total_cost,
+    SUM(oi.sale_price - p.cost) AS Total_profit,
+    (SUM(oi.sale_price - p.cost) / NULLIF(SUM(p.cost), 0)) * 100 AS Profit_to_cost_ratio
+  FROM
+    bigquery-public-data.thelook_ecommerce.orders o
+  JOIN
+    bigquery-public-data.thelook_ecommerce.order_items oi ON o.order_id = oi.order_id
+  JOIN
+    bigquery-public-data.thelook_ecommerce.products p ON oi.product_id = p.id
+  WHERE
+    o.status = 'Shipped'
+  GROUP BY
+    Month, Year, Product_category
+)
 
+SELECT
+  Month,
+  Year,
+  Product_category,
+  TPV,
+  TPO,
+  CASE
+    WHEN Previous_TPV IS NOT NULL THEN ((TPV - Previous_TPV) / Previous_TPV) * 100
+    ELSE NULL
+  END AS Revenue_growth,
+  CASE
+    WHEN Previous_TPO IS NOT NULL THEN ((TPO - Previous_TPO) / Previous_TPO) * 100
+    ELSE NULL
+  END AS Order_growth,
+  Total_cost,
+  Total_profit,
+  Profit_to_cost_ratio
+FROM
+  MonthlyMetrics;
